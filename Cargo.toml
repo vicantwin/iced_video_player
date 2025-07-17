@@ -11,37 +11,66 @@ authors = ["jazzfool"]
 edition = "2021"
 resolver = "2"
 license = "MIT OR Apache-2.0"
-exclude = [
-    ".media/test.mp4"
-]
+exclude = [".media/test.mp4"]
 
 [dependencies]
-iced = { version = "0.13", features = ["image", "advanced", "wgpu"] }
-iced_wgpu = "0.13"
-gstreamer = "0.23"
-gstreamer-app = "0.23" # appsink
-gstreamer-base = "0.23" # basesrc
-glib = "0.20" # gobject traits and error type
+iced = { version = "0.14.0-dev", features = ["image", "advanced", "wgpu"] }
+iced_wgpu = "0.14.0-dev"
+gstreamer = "0.24"
+gstreamer-app = "0.24"                                                      # appsink
+gstreamer-base = "0.24"                                                     # basesrc
+glib = "0.21.0"                                                             # gobject traits and error type
 log = "0.4"
 thiserror = "1"
-url = "2" # media uri
+url = "2"                                                                   # media uri
+
+[profile.dev.package.objc2]
+debug-assertions = false
 
 [package.metadata.nix]
 systems = ["x86_64-linux"]
 app = true
 build = true
 runtimeLibs = [
-    "vulkan-loader",
-    "wayland",
-    "wayland-protocols",
-    "libxkbcommon",
-    "xorg.libX11",
-    "xorg.libXrandr",
-    "xorg.libXi", "gst_all_1.gstreamer", "gst_all_1.gstreamermm", "gst_all_1.gst-plugins-bad", "gst_all_1.gst-plugins-ugly", "gst_all_1.gst-plugins-good", "gst_all_1.gst-plugins-base",
+  "vulkan-loader",
+  "wayland",
+  "wayland-protocols",
+  "libxkbcommon",
+  "xorg.libX11",
+  "xorg.libXrandr",
+  "xorg.libXi",
+  "gst_all_1.gstreamer",
+  "gst_all_1.gstreamermm",
+  "gst_all_1.gst-plugins-bad",
+  "gst_all_1.gst-plugins-ugly",
+  "gst_all_1.gst-plugins-good",
+  "gst_all_1.gst-plugins-base",
 ]
-buildInputs = ["libxkbcommon", "gst_all_1.gstreamer", "gst_all_1.gstreamermm", "gst_all_1.gst-plugins-bad", "gst_all_1.gst-plugins-ugly", "gst_all_1.gst-plugins-good", "gst_all_1.gst-plugins-base"]
+buildInputs = [
+  "libxkbcommon",
+  "gst_all_1.gstreamer",
+  "gst_all_1.gstreamermm",
+  "gst_all_1.gst-plugins-bad",
+  "gst_all_1.gst-plugins-ugly",
+  "gst_all_1.gst-plugins-good",
+  "gst_all_1.gst-plugins-base",
+]
 
 [package.metadata.docs.rs]
 rustc-args = ["--cfg", "docsrs"]
 rustdoc-args = ["--cfg", "docsrs"]
 targets = ["wasm32-unknown-unknown"]
+
+
+[patch.crates-io]
+iced.git = "https://github.com/iced-rs/iced.git"
+iced.rev = "283d0e74a8050ea625da25e0b9180b65f11d1843"
+
+iced_core.git = "https://github.com/iced-rs/iced.git"
+iced_core.rev = "283d0e74a8050ea625da25e0b9180b65f11d1843"
+
+iced_widget.git = "https://github.com/iced-rs/iced.git"
+iced_widget.rev = "283d0e74a8050ea625da25e0b9180b65f11d1843"
+
+iced_wgpu.git = "https://github.com/iced-rs/iced.git"
+iced_wgpu.rev = "283d0e74a8050ea625da25e0b9180b65f11d1843"

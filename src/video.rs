@@ -49,7 +49,7 @@ impl Frame {
         Self(gst::Sample::builder().build())
     }
 
-    pub fn readable(&self) -> Option<gst::BufferMap<gst::buffer::Readable>> {
+    pub fn readable(&'_ self) -> Option<gst::BufferMap<'_, gst::buffer::Readable>> {
         self.0.buffer().and_then(|x| x.map_readable().ok())
     }
 }
@@ -182,7 +182,7 @@ impl Internal {
             self.sync_av_counter += 1;
             self.sync_av_avg = self.sync_av_avg * (self.sync_av_counter - 1) / self.sync_av_counter
                 + offset.as_nanos() as u64 / self.sync_av_counter;
-            if self.sync_av_counter % 128 == 0 {
+            if self.sync_av_counter.is_multiple_of(128) {
                 self.source
                     .set_property("av-offset", -(self.sync_av_avg as i64));
             }
@@ -305,7 +305,7 @@ impl Video {
                 .unwrap_or(0),
         );
 
-        let sync_av = pipeline.has_property("av-offset", None);
+        let sync_av = pipeline.has_property("av-offset");
 
         // NV12 = 12bpp
         let frame = Arc::new(Mutex::new(Frame::empty()));

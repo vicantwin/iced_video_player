@@ -1,13 +1,15 @@
 use crate::{pipeline::VideoPrimitive, video::Video};
 use gstreamer as gst;
 use iced::{
-    advanced::{self, graphics::core::event::Status, layout, widget, Widget},
+    advanced::{self, layout, widget, Widget},
     Element,
 };
 use iced_wgpu::primitive::Renderer as PrimitiveRenderer;
 use log::error;
 use std::{marker::PhantomData, sync::atomic::Ordering, time::Duration};
 use std::{sync::Arc, time::Instant};
+
+type ErrorCallback<'a, Message> = Box<dyn Fn(&glib::Error) -> Message + 'a>;
 
 /// Video player widget which displays the current frame of a [`Video`](crate::Video).
 pub struct VideoPlayer<'a, Message, Theme = iced::Theme, Renderer = iced::Renderer>
@@ -21,7 +23,7 @@ where
     on_end_of_stream: Option<Message>,
     on_new_frame: Option<Message>,
     on_subtitle_text: Option<Box<dyn Fn(Option<String>) -> Message + 'a>>,
-    on_error: Option<Box<dyn Fn(&glib::Error) -> Message + 'a>>,
+    on_error: Option<ErrorCallback<'a, Message>>,
     _phantom: PhantomData<(Theme, Renderer)>,
 }
 
@@ -212,17 +214,17 @@ where
         }
     }
 
-    fn on_event(
+    fn update(
         &mut self,
         _state: &mut widget::Tree,
-        event: iced::Event,
+        event: &iced::Event,
         _layout: advanced::Layout<'_>,
         _cursor: advanced::mouse::Cursor,
         _renderer: &Renderer,
         _clipboard: &mut dyn advanced::Clipboard,
         shell: &mut advanced::Shell<'_, Message>,
         _viewport: &iced::Rectangle,
-    ) -> Status {
+    ) {
         let mut inner = self.video.write();
 
         if let iced::Event::Window(iced::window::Event::RedrawRequested(_)) = event {
@@ -284,15 +286,11 @@ where
                     }
                 }
 
-                shell.request_redraw(iced::window::RedrawRequest::NextFrame);
+                shell.request_redraw();
             } else {
-                shell.request_redraw(iced::window::RedrawRequest::At(
-                    Instant::now() + Duration::from_millis(32),
-                ));
+                shell.request_redraw_at(Instant::now() + Duration::from_millis(32));
             }
-            Status::Captured
-        } else {
-            Status::Ignored
+            shell.capture_event();
         }
     }
 }
